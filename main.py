@@ -11,11 +11,16 @@ from PIL.ExifTags import TAGS
 from datetime import datetime
 from pathlib import Path
 from pytesseract import pytesseract
+from datetime import date
 
-path_tesseract = r"C:\\Program Files\Tesseract-OCR\tesseract.exe"
-pytesseract.tesseract_cmd = path_tesseract
-text = pytesseract.image_to_string('images/car-plate1.jpg')
 ocr_text_result = ""
+pytesseract_result = ""
+path_tesseract = r"C:\\Program Files\Tesseract-OCR\tesseract.exe"
+
+def pytesseract_ocr_extract(image_path):
+    pytesseract.tesseract_cmd = path_tesseract
+    global pytesseract_result
+    pytesseract_result = pytesseract.image_to_string(image_path)
 
 def get_metadata(image_path):
     print("--------------------------------")
@@ -95,12 +100,29 @@ def process_image_ocr(image_path):
         print("No contour detected. Ending process early.")
         return "-"
 
+def show_file_list():
+    print("Available images in the 'images' folder:")
+    entries = os.listdir('images')
+    n = 0
+    img_array = []
+    for entry in entries:
+        print(n, " - ", entry)
+        img_array.append(entry)
+        n += 1
+    file_index = input("Enter the index of the image chosen (0, 1, 2, etc): ")
+    time.sleep(.5)
+    file_path = "images/" + img_array[int(file_index)]
+    print(file_path)
+    time.sleep(.3)
+    check_file_path(file_path)
+    time.sleep(1)
+
+
 def append_data_to_csv(file_path):
     file_name = Path(file_path).name
     file_stem = Path(file_path).stem
 
-    print(file_path)
-    data = {'NOME IMAGEM': [file_stem], "DATA": [get_metadata(file_path)], "TEXTO EXTRAIDO": [process_image_ocr(file_path)], "IMAGEM": [file_path]}
+    data = {'NOME IMAGEM': [file_stem], "DATA": [datetime.now().replace(microsecond=0)], "TEXTO EXTRAIDO": [process_image_ocr(file_path)], "IMAGEM": [file_path]}
 
     df = pandas.DataFrame(data)
     df.to_csv('output_ocr.csv', mode='a', index=False, header=False)
@@ -109,9 +131,13 @@ def append_data_to_csv(file_path):
     print("Here is the latest data added to output_ocr.csv:")
     print(df)
     print("********************************")
+    retry = input("Do you want to process another image? (y/n): ")
+    if retry == "y" or retry == "Y":
+        show_file_list()
+    else:
+        quit()
 
 def process_image(file_path):
-    get_metadata(file_path)
     process_image_ocr(file_path)
     append_data_to_csv(file_path)
 
@@ -133,22 +159,8 @@ def start_program():
     print("********************************")
     time.sleep(.5)
     print("Welcome to the Image EXIF and OCR Extractor Software!")
-    time.sleep(.5)
-    print("For extracting EXIF data from an image, please insert an image to the 'images' folder from the following formats: JPG and JPEG")
     time.sleep(.8)
-    print("Available images in the 'images' folder:")
-    entries = os.listdir('images')
-    n = 0
-    img_array = []
-    for entry in entries:
-        print(n, " - ", entry)
-        img_array.append(entry)
-        n += 1
-    file_index = input("Enter the index of the image chosen (0, 1, 2, etc): ")
-    file_path = "images/" + img_array[int(file_index)]
-    print(file_path)
-    check_file_path(file_path)
-    time.sleep(1)
+    show_file_list()
 
 start_program()
 

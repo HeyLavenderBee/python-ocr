@@ -1,5 +1,4 @@
-OUTPUT OCR,,,,
 NOME IMAGEM,DATA,TEXTO EXTRAIDO,IMAGEM
-carro 1,16/01/2026,NET0908,
-photo,-,-,images/photo.jpeg
-photo,-,-,images/photo.jpeg
+photo,2026-03-03 15:11:02,-,images/photo.jpeg
+car-plate1,2026-03-04 15:20:37,8,images/car-plate1.jpg
+image,2026-03-04 15:23:43,-,images/image.png
